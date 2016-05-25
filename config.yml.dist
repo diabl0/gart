@@ -1,0 +1,9 @@
+mongo:
+  server: mongodb://localhost:27017
+  database: gart
+  collection: test
+
+google:
+  clientEmail: some@email
+  privateKey: path/to/file.p12
+  viewId: 12345678
