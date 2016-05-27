@@ -1,9 +1,30 @@
 mongo:
   server: mongodb://localhost:27017
   database: gart
-  collection: test
+  collection: d1
 
 google:
   clientEmail: some@email
-  privateKey: path/to/file.p12
-  viewId: 12345678
+  privateKey: chris.p12
+  viewId: 123234
+  realtime:
+    dimmensions:
+      d1:
+        - rt:city
+        - rt:browserVersion
+        - rt:operatingSystemVersion
+        - rt:pagePath
+        - rt:campaign
+        - rt:source
+        - rt:medium
+      d2:
+        - rt:city
+        - rt:browserVersion
+        - rt:operatingSystemVersion
+        - rt:pagePath
+        - rt:referralPath
+        - rt:trafficType
+        - rt:keyword
+
+gearman:
+  servers: localhost
