@@ -2,6 +2,7 @@
 namespace Luxoft\Gearman\Workers;
 
 use Luxoft\GA\RT;
+use Predis\Client;
 
 class GART
 {
@@ -23,7 +24,7 @@ class GART
     protected $gearmanClient;
 
     /**
-     * @var \Predis\Client
+     * @var Client
      */
     protected $redis;
 
@@ -34,7 +35,7 @@ class GART
     public function __construct($config)
     {
         $this->config = $config;
-        $this->redis  = new \Predis\Client($config['redis']['connection'], $config['redis']['options']);
+        $this->redis  = new Client($config['redis']['connection'], $config['redis']['options']);
 
         $mongoClient = new \MongoClient($this->config['mongo']['server']); // connect
         $this->DB    = $mongoClient->selectDB($this->config['mongo']['database']);

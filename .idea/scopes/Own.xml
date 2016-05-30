@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="Own" pattern="!file[test1]:vendor/*&amp;&amp;!file[test1]:.idea/*||file[test1]:src/*||file[test1]:src//*||file[test1]:workers//*" />
+</component>

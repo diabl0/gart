@@ -5,7 +5,7 @@
  * @see https://github.com/brianlmoon/GearmanManager
  */
 
-require_once __DIR__.'/../vendor/autoload.php';
+require __DIR__.'/../vendor/autoload.php';
 
 use Symfony\Component\Yaml\Yaml;
 

@@ -30,7 +30,9 @@ abstract class AbstractClient
      */
     protected function getClient()
     {
+        /** @noinspection PhpUndefinedMethodInspection */
         if ($this->client->getAuth()->isAccessTokenExpired()) {
+            /** @noinspection PhpUndefinedMethodInspection */
             $this->client->getAuth()->refreshTokenWithAssertion();
         }
 

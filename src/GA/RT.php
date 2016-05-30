@@ -46,6 +46,7 @@ class RT extends AbstractClient
     protected function formatData($data)
     {
         $rows = $data->getRows();
+        /** @noinspection PhpUndefinedFieldInspection */
         $columnHeaders = $data->columnHeaders;
 
         $output = [];
