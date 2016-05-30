@@ -5,7 +5,7 @@ use Symfony\Component\Yaml\Yaml;
 
 $config = Yaml::parse(file_get_contents(__DIR__.'/config.yml'));
 
-$cc = new Luxoft\Gearman\Workers\GART();
+$cc = new Luxoft\Gearman\Workers\GART($config);
 
 // Reverse Worker Code
 $worker = new GearmanWorker();

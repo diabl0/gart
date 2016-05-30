@@ -4,10 +4,8 @@ mongo:
   collection: d1
 
 google:
-  clientEmail: some@email
-  privateKey: chris.p12
-  viewId: 123234
   realtime:
+    rps: 30
     dimmensions:
       d1:
         - rt:city
@@ -25,6 +23,28 @@ google:
         - rt:referralPath
         - rt:trafficType
         - rt:keyword
+    views:
+      - 122380763
+      - 113985796
+      - 3918249
+    users:
+      Chris:
+        clientEmail: iam@email.com
+        privateKey: chris.p12
+      Diabl0:
+        clientEmail: iam@email.com
+        privateKey: diabl0.p12
+
+
 
 gearman:
   servers: localhost
+
+redis:
+  options:
+    prefix: gart
+  connection:
+    1:
+      scheme: tcp
+      host:   localhost
+      port:   6379

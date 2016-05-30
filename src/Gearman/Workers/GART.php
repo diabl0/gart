@@ -2,7 +2,6 @@
 namespace Luxoft\Gearman\Workers;
 
 use Luxoft\GA\RT;
-use Symfony\Component\Yaml\Yaml;
 
 class GART
 {
@@ -23,13 +22,20 @@ class GART
      */
     protected $gearmanClient;
 
-    public function __construct()
-    {
-        $this->config = Yaml::parse(file_get_contents('config.yml'));
-        $clientEmail  = $this->config['google']['clientEmail'];
-        $privateKey   = file_get_contents($this->config['google']['privateKey']);
+    /**
+     * @var \Predis\Client
+     */
+    protected $redis;
 
-        $this->RT    = new RT($clientEmail, $privateKey, $this->config['google']['viewId']);
+    /**
+     * GART constructor.
+     * @param array $config
+     */
+    public function __construct($config)
+    {
+        $this->config = $config;
+        $this->redis  = new \Predis\Client($config['redis']['connection'], $config['redis']['options']);
+
         $mongoClient = new \MongoClient($this->config['mongo']['server']); // connect
         $this->DB    = $mongoClient->selectDB($this->config['mongo']['database']);
 
@@ -47,7 +53,6 @@ class GART
         $dimmensions = $params['dimmensions'];
         $collection  = $params['collection'];
 
-
         $result = $this->DB->{$collection}
             ->find([], ['time' => 1, '_id' => 0])
             ->sort(['time' => -1])
@@ -64,9 +69,25 @@ class GART
             return;
         }
 
+        $viewId = $this->redis->zrange('viewsUsageCount', 0, 0);
+        $viewId = $viewId[0];
+        $userId = $this->redis->zrange('usersUsageCount', 0, 0);
+        $userId = $userId[0];
+
+        $userData = $this->config['google']['realtime']['users'][$userId];
+
+        $clientEmail = $userData['clientEmail'];
+        $privateKey  = file_get_contents(__DIR__.'/../../../'.$userData['privateKey']);
+
+        $this->RT = new RT($clientEmail, $privateKey, $viewId);
+
         $RT = $this->RT;
 
         $data = $RT->fetchData($dimmensions);
+
+        // Increase usage counters
+        $this->redis->zincrby('viewsUsageCount', 1, $viewId);
+        $this->redis->zincrby('usersUsageCount', 1, $userId);
 
         try {
             $this->DB->{$collection}->insert(
@@ -76,12 +97,17 @@ class GART
                 ]
             );
 
-            echo "[{$time}] Hit {$collection} {$job->handle()}\n";
+            echo "[{$time}] Hit {$collection} V: {$viewId} U: {$userId}\n";
         } catch (\MongoDuplicateKeyException $e) {
             // sleep and ignore
             echo "Skipping duplicated\n";
 
             return;
+        } catch (\Google_Service_Exception $e) {
+            if (strpos($e->getMessage(), '(403) Quota') !== false) {
+                // Damn, quote exceed
+                $this->redis->zadd('viewsUsageCount', [$viewId => 10000]);
+            }
         }
 
     }
